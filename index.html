@@ -866,7 +866,7 @@ body:has(#retos:target) #cover{display:none}
    <div id="empty" class="empty">No encontramos retos con esa búsqueda 🌸</div>
  </div>
  
-<div id="myMemoriesPanel" style="display:none;padding:0 18px 118px;">
+<div id="myMemoriesPanel" style="display:none;padding:182px 18px 118px;">
   <div class="detailCard">
     <div class="detailEyebrow">Tu galería</div>
     <h2 class="detailTitle">Mis recuerdos</h2>
@@ -1336,29 +1336,21 @@ function setBottomNav(active){
 }
 
 function showRetos(){
+  const retosContent=document.querySelector('#retos > .scroll');
   const panel=document.getElementById('myMemoriesPanel');
-  if(panel) panel.style.display='none';
 
-  const controls=document.querySelector('#retos .controls');
-  const list=document.querySelector('#retos .list');
-  const empty=document.getElementById('empty');
-  if(controls) controls.style.display='';
-  if(list) list.style.display='';
-  if(empty && !list?.children.length) empty.style.display='';
+  if(panel) panel.style.display='none';
+  if(retosContent) retosContent.style.display='block';
 
   setBottomNav('retos');
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
 function showMyMemories(){
+  const retosContent=document.querySelector('#retos > .scroll');
   const panel=document.getElementById('myMemoriesPanel');
 
-  const controls=document.querySelector('#retos .controls');
-  const list=document.querySelector('#retos .list');
-  const empty=document.getElementById('empty');
-  if(controls) controls.style.display='none';
-  if(list) list.style.display='none';
-  if(empty) empty.style.display='none';
+  if(retosContent) retosContent.style.display='none';
   if(panel) panel.style.display='block';
 
   setBottomNav('recuerdos');
