@@ -161,9 +161,18 @@ body:has(#retos:target) #cover{display:none}
 }
 .challengeDetail.open{display:block}
 .detailBack{
-  border:0;background:transparent;color:var(--navy);
-  font:600 16px "Cormorant Garamond",Georgia,serif;
-  padding:7px 0;margin:0 0 10px;cursor:pointer;
+  width:100%;
+  min-height:56px;
+  border:0;
+  border-radius:18px;
+  background:var(--lav);
+  color:#fff;
+  font:700 18px "Cormorant Garamond",Georgia,serif;
+  padding:14px 18px;
+  margin:0 0 16px;
+  cursor:pointer;
+  box-shadow:0 7px 18px rgba(91,76,160,.20);
+  text-align:center;
 }
 .detailCard{
   background:rgba(255,250,244,.88);
@@ -236,6 +245,58 @@ body:has(#retos:target) #cover{display:none}
 
 
 #captureSheet{display:none!important}
+
+.freeMemoryView{
+  display:none;
+  min-height:100dvh;
+  padding:182px 18px 108px;
+  position:relative;
+  z-index:3;
+}
+.freeMemoryView.open{display:block}
+.uploadPreview{
+  display:none;
+  margin-top:16px;
+  background:rgba(255,250,244,.9);
+  border:1px solid rgba(145,131,215,.25);
+  border-radius:20px;
+  padding:12px;
+}
+.uploadPreview.open{display:block}
+.uploadPreview img{
+  display:block;
+  width:100%;
+  max-height:390px;
+  object-fit:contain;
+  border-radius:14px;
+  background:#fff;
+}
+.previewActions{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:9px;
+  margin-top:11px;
+}
+.previewPrimary,.previewSecondary{
+  min-height:52px;border-radius:16px;
+  font:700 17px "Cormorant Garamond",Georgia,serif;
+  cursor:pointer;
+}
+.previewPrimary{
+  border:0;background:var(--lav);color:#fff;
+}
+.previewSecondary{
+  border:1px solid rgba(145,131,215,.4);
+  background:rgba(255,255,255,.8);color:var(--navy);
+}
+.uploadStatus{
+  display:none;
+  margin-top:12px;padding:12px 14px;border-radius:15px;
+  background:rgba(255,250,244,.92);
+  color:var(--navy);text-align:center;font-size:15px;
+}
+.uploadStatus.show{display:block}
+
 </style>
 </head>
 <body>
@@ -786,7 +847,7 @@ body:has(#retos:target) #cover{display:none}
 
 
 <section id="challengeDetail" class="challengeDetail" aria-hidden="true">
-  <button class="detailBack" type="button" onclick="closeChallengeDetail()">← Volver a los retos</button>
+  <button class="detailBack" type="button" onclick="closeChallengeDetail()">← VOLVER A LOS RETOS</button>
 
   <div class="detailCard">
     <div id="detailNumber" class="detailEyebrow">001</div>
@@ -814,6 +875,49 @@ body:has(#retos:target) #cover{display:none}
       <strong>Aún no tienes recuerdos aquí</strong>
       <p>Cuando subas una foto o video para este reto, aparecerá en esta galería.</p>
     </div>
+  </div>
+</section>
+
+
+<section id="freeMemoryView" class="freeMemoryView" aria-hidden="true">
+  <button class="detailBack" type="button" onclick="closeFreeMemory()">← VOLVER AL INICIO</button>
+
+  <div class="detailCard">
+    <div class="detailEyebrow">Nuestro día</div>
+    <h2 class="detailTitle">Subir recuerdo</h2>
+    <p style="margin:10px 0 0;color:rgba(23,40,74,.72);line-height:1.35;">
+      Comparte un momento que quieras dejarnos de este día 💜
+    </p>
+
+    <div class="detailActions">
+      <button class="detailAction" type="button" onclick="openFreePicker('camera')">📸 &nbsp; Sacar foto</button>
+      <button class="detailAction" type="button" onclick="freeVideoDemo()">🎥 &nbsp; Grabar video</button>
+      <button class="detailAction" type="button" onclick="openFreePicker('gallery')">🖼️ &nbsp; Subir desde galería</button>
+    </div>
+
+    <input id="freePhotoInput" type="file" accept="image/*" hidden>
+    <input id="freeCameraInput" type="file" accept="image/*" capture="environment" hidden>
+
+    <div id="uploadPreview" class="uploadPreview">
+      <img id="uploadPreviewImage" alt="Vista previa del recuerdo">
+      <div class="previewActions">
+        <button class="previewPrimary" type="button" onclick="openFreeMemory()">💜 SUBIR RECUERDO</button>
+        <button class="previewSecondary" type="button" onclick="clearUploadPreview()">Cambiar foto</button>
+      </div>
+    </div>
+
+    <div id="uploadStatus" class="uploadStatus"></div>
+  </div>
+
+  <div class="galleryHead">
+    <h3>Tus recuerdos libres</h3>
+    <span class="galleryCount">0 recuerdos</span>
+  </div>
+
+  <div class="emptyGallery">
+    <div class="emptyIcon">🌸</div>
+    <strong>Aún no tienes recuerdos libres</strong>
+    <p>Las fotos y videos que subas desde aquí aparecerán en esta galería.</p>
   </div>
 </section>
 
@@ -1009,6 +1113,177 @@ function retoAleatorio(){
   }
   spin();
 }
+
+
+/* ============================================================
+   RECUERDO LIBRE + PRUEBA DE SUBIDA EN SEGUNDO PLANO
+============================================================ */
+
+const RECUERDOS_API =
+  'https://script.google.com/macros/s/AKfycbzGZxguZB-diYDtcI1q0Vsx0aTgd42Lvi31JQnr0o_42ckNY8qagSaOMrIsxmTQ4IJdug/exec';
+
+let selectedFreeFile = null;
+
+function getSessionId(){
+  let id=localStorage.getItem('FA_ID_SESION_RELIGIOSO');
+  if(!id){
+    id='SES-'+Date.now()+'-'+Math.random().toString(36).slice(2,10).toUpperCase();
+    localStorage.setItem('FA_ID_SESION_RELIGIOSO',id);
+  }
+  return id;
+}
+
+function openFreeMemory(){
+  const retos=document.getElementById('retos');
+  const detail=document.getElementById('challengeDetail');
+  const free=document.getElementById('freeMemoryView');
+
+  if(retos) retos.style.display='none';
+  if(detail){
+    detail.classList.remove('open');
+    detail.setAttribute('aria-hidden','true');
+  }
+  free.classList.add('open');
+  free.setAttribute('aria-hidden','false');
+  window.scrollTo({top:0,behavior:'instant'});
+}
+
+function closeFreeMemory(){
+  clearUploadPreview();
+  const free=document.getElementById('freeMemoryView');
+  free.classList.remove('open');
+  free.setAttribute('aria-hidden','true');
+
+  /* Volvemos a la portada si existe; si no, mostramos la lista */
+  const portada =
+    document.getElementById('portada') ||
+    document.querySelector('.cover') ||
+    document.querySelector('.portada');
+
+  if(portada){
+    portada.style.display='';
+    window.scrollTo({top:0,behavior:'instant'});
+  }else{
+    const retos=document.getElementById('retos');
+    if(retos) retos.style.display='block';
+    window.scrollTo({top:0,behavior:'instant'});
+  }
+}
+
+function openFreePicker(mode){
+  const input=document.getElementById(
+    mode==='camera' ? 'freeCameraInput' : 'freePhotoInput'
+  );
+  input.value='';
+  input.click();
+}
+
+function freeVideoDemo(){
+  alert('La grabación de video la conectaremos después de confirmar que la subida de foto funciona sin salir de GitHub 💜');
+}
+
+function prepareFreePreview(file){
+  if(!file) return;
+  selectedFreeFile=file;
+
+  const reader=new FileReader();
+  reader.onload=()=>{
+    document.getElementById('uploadPreviewImage').src=reader.result;
+    document.getElementById('uploadPreview').classList.add('open');
+    setUploadStatus('');
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearUploadPreview(){
+  selectedFreeFile=null;
+  const box=document.getElementById('uploadPreview');
+  const img=document.getElementById('uploadPreviewImage');
+  if(box) box.classList.remove('open');
+  if(img) img.removeAttribute('src');
+  setUploadStatus('');
+}
+
+function setUploadStatus(message){
+  const el=document.getElementById('uploadStatus');
+  if(!el) return;
+  el.textContent=message || '';
+  el.classList.toggle('show',Boolean(message));
+}
+
+async function uploadTestMemory(){
+  if(!selectedFreeFile){
+    setUploadStatus('Primero selecciona una foto.');
+    return;
+  }
+
+  setUploadStatus('Subiendo recuerdo… 💜');
+
+  try{
+    const dataUrl=await fileToDataURL(selectedFreeFile);
+    const base64=dataUrl.split(',')[1];
+
+    const body=new URLSearchParams();
+    body.set('accion','recuerdoReligioso');
+    body.set('idSesion',getSessionId());
+    body.set('idReto','');
+    body.set('tipo','foto');
+    body.set('nombreArchivo',selectedFreeFile.name || ('recuerdo_'+Date.now()+'.jpg'));
+    body.set('mimeType',selectedFreeFile.type || 'image/jpeg');
+    body.set('archivoBase64',base64);
+
+    const response=await fetch(RECUERDOS_API,{
+      method:'POST',
+      headers:{'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8'},
+      body:body.toString(),
+      redirect:'follow'
+    });
+
+    const text=await response.text();
+    let result;
+    try{ result=JSON.parse(text); }
+    catch(_){ throw new Error('La respuesta del servidor no llegó como JSON.'); }
+
+    if(!result.ok){
+      throw new Error(result.error || 'No se pudo guardar el recuerdo.');
+    }
+
+    setUploadStatus('¡Recuerdo guardado! 🌸 Seguimos dentro de la aplicación.');
+  }catch(error){
+    console.error(error);
+    setUploadStatus(
+      'La prueba no pudo completarse: '+(error.message || error)+
+      ' — seguimos en GitHub.'
+    );
+  }
+}
+
+function fileToDataURL(file){
+  return new Promise((resolve,reject)=>{
+    const reader=new FileReader();
+    reader.onload=()=>resolve(reader.result);
+    reader.onerror=()=>reject(new Error('No se pudo leer la foto.'));
+    reader.readAsDataURL(file);
+  });
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  getSessionId();
+
+  const gallery=document.getElementById('freePhotoInput');
+  const camera=document.getElementById('freeCameraInput');
+
+  if(gallery){
+    gallery.addEventListener('change',e=>{
+      prepareFreePreview(e.target.files && e.target.files[0]);
+    });
+  }
+  if(camera){
+    camera.addEventListener('change',e=>{
+      prepareFreePreview(e.target.files && e.target.files[0]);
+    });
+  }
+});
 
 </script>
 </body></html>
