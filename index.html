@@ -46,8 +46,8 @@ h1{font-family:"Libre Baskerville",Georgia,serif;font-size:18px;line-height:1.45
 
 
 .entry-link{display:block;text-decoration:none}
-#retos:target{display:block}
-body:has(#retos:target) #cover{display:none}
+
+
 
 
 .progressbox{
@@ -320,6 +320,118 @@ body:has(#retos:target) #cover{display:none}
   margin-bottom:4px;
 }
 
+
+/* ===== NAVEGACIÓN LIMPIA · V4 ===== */
+.bottom{
+  grid-template-columns:repeat(3,1fr) !important;
+  min-height:86px !important;
+}
+.bottom button{
+  min-height:64px !important;
+  font-size:16px !important;
+}
+.bottom .on{
+  background:rgba(145,131,215,.13) !important;
+  color:#745fba !important;
+}
+.personalProgress{
+  display:none;
+  position:absolute;
+  z-index:11;
+  top:112px;
+  left:15px;
+  right:15px;
+  margin:0;
+  padding:13px 15px 12px;
+  background:rgba(255,252,248,.88);
+  border:1px solid rgba(150,130,165,.22);
+  border-radius:18px;
+  box-shadow:0 5px 16px rgba(70,55,85,.07);
+  backdrop-filter:blur(4px);
+}
+.personalProgress strong{
+  font-family:"Libre Baskerville",Georgia,serif;
+  font-size:13px;
+}
+.personalProgress .personalCount{
+  float:right;
+  font-size:14px;
+}
+.myMemoriesContent{
+  display:none;
+  position:absolute;
+  inset:0;
+  overflow:auto;
+  padding:225px 15px 108px;
+  scrollbar-width:none;
+}
+.myMemoriesContent::-webkit-scrollbar{display:none}
+.memoryActions{
+  display:grid;
+  gap:10px;
+  margin-top:16px;
+}
+.memoryAction{
+  width:100%;
+  min-height:54px;
+  border:1px solid rgba(145,131,215,.34);
+  border-radius:17px;
+  background:rgba(255,255,255,.76);
+  color:var(--navy);
+  padding:13px 15px;
+  text-align:left;
+  font:700 17px "Cormorant Garamond",Georgia,serif;
+}
+.uploadTray{
+  display:none;
+  margin-top:16px;
+  padding:13px;
+  border-radius:20px;
+  background:rgba(255,250,244,.92);
+  border:1px solid rgba(145,131,215,.28);
+}
+.uploadTray.open{display:block}
+.trayTitle{font-size:18px;font-weight:700;margin-bottom:10px}
+.trayGrid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:8px;
+}
+.trayItem{
+  position:relative;
+  aspect-ratio:1/1;
+  overflow:hidden;
+  border-radius:14px;
+  background:#fff;
+}
+.trayItem img,.trayItem video{width:100%;height:100%;object-fit:cover}
+.trayRemove{
+  position:absolute;right:5px;top:5px;
+  width:30px;height:30px;border:0;border-radius:50%;
+  background:rgba(255,250,244,.95);
+  color:var(--navy);font-size:20px;
+}
+.trayVideo{
+  position:absolute;left:5px;bottom:5px;
+  padding:3px 6px;border-radius:9px;
+  background:rgba(23,40,74,.78);color:#fff;font-size:11px;
+}
+.trayButton{
+  width:100%;
+  min-height:52px;
+  margin-top:10px;
+  border:0;
+  border-radius:17px;
+  background:var(--lav);
+  color:#fff;
+  font:700 17px "Cormorant Garamond",Georgia,serif;
+}
+.trayMore{
+  background:rgba(255,255,255,.78);
+  color:var(--navy);
+  border:1px solid rgba(145,131,215,.38);
+}
+
 </style>
 </head>
 <body>
@@ -332,8 +444,8 @@ body:has(#retos:target) #cover{display:none}
  <h1>100 RETOS PARA RECORDAR<br>ESTE DÍA</h1>
  <p class="desc">Captura esos pequeños momentos<br>que quizás nosotros no alcancemos<br>a ver.</p>
  <div class="actions">
-   <a class="btn entry-link" href="#retos">Ver retos &nbsp;→</a>
-   <a class="btn secondary entry-link" href="javascript:void(0)" onclick="openFreeMemory()">☁︎ &nbsp; Subir recuerdo &nbsp;→</a>
+   <button class="btn entry-link" type="button" onclick="showRetos()">Ver retos &nbsp;→</button>
+   <button class="btn secondary entry-link" type="button" onclick="openFreeMemory()">☁︎ &nbsp; Subir recuerdo &nbsp;→</button>
  </div>
 </section>
 
@@ -341,7 +453,7 @@ body:has(#retos:target) #cover{display:none}
  <header class="header"><img src="logo.png" alt="Logo F A"></header>
 <div class="progressbox">
      <div class="progresshead">
-       <strong>RECUERDOS COMPLETADOS</strong>
+       <strong>RETOS COMPLETADOS</strong>
        <span id="progressText">0 de 100</span>
      </div>
      <div class="progressbar" aria-label="Progreso de retos">
@@ -866,22 +978,43 @@ body:has(#retos:target) #cover{display:none}
    <div id="empty" class="empty">No encontramos retos con esa búsqueda 🌸</div>
  </div>
  
-<div id="myMemoriesPanel" style="display:none;padding:182px 18px 118px;">
+
+<div id="personalProgress" class="personalProgress">
+  <strong>RECUERDOS COMPARTIDOS</strong>
+  <span id="personalMemoryCount" class="personalCount">0 recuerdos</span>
+</div>
+
+<div id="myMemoriesPanel" class="myMemoriesContent">
   <div class="detailCard">
     <div class="detailEyebrow">Tu galería</div>
     <h2 class="detailTitle">Mis recuerdos</h2>
     <p style="margin:10px 0 0;color:rgba(23,40,74,.72);line-height:1.35;">
-      Aquí aparecerán todas las fotos y videos que hayas compartido desde este dispositivo.
+      Aquí encontrarás todas las fotos y videos que hayas compartido desde este dispositivo.
     </p>
+
+    <div class="memoryActions">
+      <button class="memoryAction" type="button" onclick="chooseMedia('camera','personal')">📸 &nbsp; Sacar foto</button>
+      <button class="memoryAction" type="button" onclick="chooseMedia('video','personal')">🎥 &nbsp; Grabar video</button>
+      <button class="memoryAction" type="button" onclick="chooseMedia('gallery','personal')">🖼️ &nbsp; Abrir galería</button>
+    </div>
+
+    <div id="tray-personal" class="uploadTray"></div>
   </div>
-  <div class="emptyGallery" style="margin-top:16px;">
+
+  <div class="galleryHead">
+    <h3>Tu galería personal</h3>
+    <span class="galleryCount">0 recuerdos</span>
+  </div>
+
+  <div class="emptyGallery">
     <div class="emptyIcon">🌸</div>
     <strong>Aún no tienes recuerdos guardados</strong>
-    <p>Cuando conectemos la galería real, tus recuerdos aparecerán aquí.</p>
+    <p>Todo lo que subas desde este dispositivo aparecerá aquí.</p>
   </div>
 </div>
 
 <nav class="bottom" aria-label="Navegación principal">
+  <button id="navInicio" type="button" onclick="showHome()"><span class="navIcon">⌂</span>Inicio</button>
   <button id="navRetos" class="on" type="button" onclick="showRetos()"><span class="navIcon">▣</span>Retos</button>
   <button id="navRecuerdos" type="button" onclick="showMyMemories()"><span class="navIcon">▧</span>Mis recuerdos</button>
 </nav>
@@ -896,9 +1029,9 @@ body:has(#retos:target) #cover{display:none}
     <h2 id="detailTitle" class="detailTitle">Reto</h2>
 
     <div class="detailActions">
-      <button class="detailAction" type="button" onclick="detailActionDemo('foto')">📸 &nbsp; Sacar foto</button>
-      <button class="detailAction" type="button" onclick="detailActionDemo('video')">🎥 &nbsp; Grabar video</button>
-      <button class="detailAction" type="button" onclick="detailActionDemo('galería')">🖼️ &nbsp; Subir desde galería</button>
+      <button class="detailAction" type="button" onclick="chooseMedia('camera','challenge')">📸 &nbsp; Sacar foto</button>
+      <button class="detailAction" type="button" onclick="chooseMedia('video','challenge')">🎥 &nbsp; Grabar video</button>
+      <button class="detailAction" type="button" onclick="chooseMedia('gallery','challenge')">🖼️ &nbsp; Subir desde galería</button>
     </div>
 
     <div class="detailNotice">
@@ -911,6 +1044,8 @@ body:has(#retos:target) #cover{display:none}
     <span id="detailGalleryCount" class="galleryCount">0 recuerdos</span>
   </div>
 
+  <div id="tray-challenge" class="uploadTray"></div>
+
   <div id="detailGallery">
     <div class="emptyGallery">
       <div class="emptyIcon">🌸</div>
@@ -922,7 +1057,7 @@ body:has(#retos:target) #cover{display:none}
 
 
 <section id="freeMemoryView" class="freeMemoryView" aria-hidden="true">
-  <button class="detailBack" type="button" onclick="closeFreeMemory()">← VOLVER AL INICIO</button>
+  <button class="detailBack" type="button" onclick="showHome()">← VOLVER AL INICIO</button>
 
   <div class="detailCard">
     <div class="detailEyebrow">Nuestro día</div>
@@ -932,23 +1067,12 @@ body:has(#retos:target) #cover{display:none}
     </p>
 
     <div class="detailActions">
-      <button class="detailAction" type="button" onclick="openFreePicker('camera')">📸 &nbsp; Sacar foto</button>
-      <button class="detailAction" type="button" onclick="freeVideoDemo()">🎥 &nbsp; Grabar video</button>
-      <button class="detailAction" type="button" onclick="openFreePicker('gallery')">🖼️ &nbsp; Subir desde galería</button>
+      <button class="detailAction" type="button" onclick="chooseMedia('camera','free')">📸 &nbsp; Sacar foto</button>
+      <button class="detailAction" type="button" onclick="chooseMedia('video','free')">🎥 &nbsp; Grabar video</button>
+      <button class="detailAction" type="button" onclick="chooseMedia('gallery','free')">🖼️ &nbsp; Abrir galería</button>
     </div>
 
-    <input id="freePhotoInput" type="file" accept="image/*" hidden>
-    <input id="freeCameraInput" type="file" accept="image/*" capture="environment" hidden>
-
-    <div id="uploadPreview" class="uploadPreview">
-      <img id="uploadPreviewImage" alt="Vista previa del recuerdo">
-      <div class="previewActions">
-        <button class="previewPrimary" type="button" onclick="uploadTestMemory()">💜 SUBIR RECUERDO</button>
-        <button class="previewSecondary" type="button" onclick="clearUploadPreview()">Cambiar foto</button>
-      </div>
-    </div>
-
-    <div id="uploadStatus" class="uploadStatus"></div>
+    <div id="tray-free" class="uploadTray"></div>
   </div>
 
   <div class="galleryHead">
@@ -963,6 +1087,10 @@ body:has(#retos:target) #cover{display:none}
   </div>
 </section>
 
+<input id="galleryInput" type="file" accept="image/*,video/*" multiple hidden>
+<input id="cameraInput" type="file" accept="image/*" capture="environment" hidden>
+<input id="videoInput" type="file" accept="video/*" capture="environment" hidden>
+
 <div id="captureSheet" class="sheetback" onclick="closeCapture(event)">
   <div class="sheet">
     <h2 id="sheetTitle">Reto</h2>
@@ -975,31 +1103,104 @@ body:has(#retos:target) #cover{display:none}
 
 </main>
 <script>
-
 let currentFilter='todos';
 let currentReto=null;
+let sorteando=false;
 const demoRealizados=new Set();
 
-function openApp(){
-  document.getElementById('cover').style.display='none';
-  document.getElementById('retos').style.display='block';
-  renderRetos();
+let trayFiles=[];
+let trayContext='free';
+
+function el(id){ return document.getElementById(id); }
+
+function hideAllMainViews(){
+  el('cover').style.display='none';
+  el('retos').style.display='none';
+
+  const detail=el('challengeDetail');
+  detail.classList.remove('open');
+  detail.setAttribute('aria-hidden','true');
+
+  const free=el('freeMemoryView');
+  free.classList.remove('open');
+  free.setAttribute('aria-hidden','true');
 }
+
+function setBottomNav(active){
+  ['Inicio','Retos','Recuerdos'].forEach(name=>{
+    const button=el('nav'+name);
+    if(button) button.classList.toggle('on',name.toLowerCase()===active);
+  });
+}
+
+function showHome(){
+  hideAllMainViews();
+  el('cover').style.display='flex';
+  window.scrollTo({top:0,behavior:'instant'});
+}
+
+function showRetos(){
+  hideAllMainViews();
+
+  el('retos').style.display='block';
+  el('personalProgress').style.display='none';
+  el('myMemoriesPanel').style.display='none';
+
+  const scroll=document.querySelector('#retos > .scroll');
+  if(scroll) scroll.style.display='block';
+
+  const progress=document.querySelector('#retos > .progressbox');
+  if(progress) progress.style.display='block';
+
+  setBottomNav('retos');
+  renderRetos();
+  window.scrollTo({top:0,behavior:'instant'});
+}
+
+function showMyMemories(){
+  hideAllMainViews();
+
+  el('retos').style.display='block';
+
+  const scroll=document.querySelector('#retos > .scroll');
+  if(scroll) scroll.style.display='none';
+
+  const progress=document.querySelector('#retos > .progressbox');
+  if(progress) progress.style.display='none';
+
+  el('personalProgress').style.display='block';
+  el('myMemoriesPanel').style.display='block';
+
+  setBottomNav('recuerdos');
+  window.scrollTo({top:0,behavior:'instant'});
+}
+
+function openFreeMemory(){
+  hideAllMainViews();
+  const free=el('freeMemoryView');
+  free.classList.add('open');
+  free.setAttribute('aria-hidden','false');
+  window.scrollTo({top:0,behavior:'instant'});
+}
+
 function setFilter(filter,btn){
   currentFilter=filter;
   document.querySelectorAll('.chip').forEach(x=>x.classList.remove('on'));
   btn.classList.add('on');
   renderRetos();
 }
+
 function renderRetos(){
-  const q=(document.getElementById('search')?.value||'').trim().toLowerCase();
+  const q=(el('search')?.value||'').trim().toLowerCase();
   let visibles=0;
+
   document.querySelectorAll('.reto-card').forEach(card=>{
     const matchText=!q || card.dataset.text.includes(q) || card.dataset.id.includes(q);
     const matchFilter=currentFilter==='todos' || demoRealizados.has(card.dataset.id);
     const show=matchText && matchFilter;
     card.style.display=show?'block':'none';
     if(show) visibles++;
+
     const done=demoRealizados.has(card.dataset.id);
     const row=card.querySelector('.row');
     if(done){
@@ -1010,111 +1211,80 @@ function renderRetos(){
       row.querySelector('button').textContent='Capturar →';
     }
   });
-  document.getElementById('countline').textContent =
-    currentFilter==='realizados' ? `${visibles} retos realizados` : `${visibles} retos disponibles`;
-  document.getElementById('empty').style.display=visibles?'none':'block';
+
+  el('countline').textContent=
+    currentFilter==='realizados'
+      ? `${visibles} retos realizados`
+      : `${visibles} retos disponibles`;
+
+  el('empty').style.display=visibles?'none':'block';
   updateProgress();
 }
+
 function updateProgress(){
   const total=100;
   const done=demoRealizados.size;
   const pct=Math.min(100,Math.round((done/total)*100));
-  document.getElementById('progressText').textContent=`${done} de ${total}`;
-  document.getElementById('progressFill').style.width=`${pct}%`;
+
+  el('progressText').textContent=`${done} de ${total}`;
+  el('progressFill').style.width=`${pct}%`;
+
   let note='¡Que comience la misión! 💜';
   if(done>=1 && done<25) note='¡Ya empezaste! Cada recuerdo cuenta 🌸';
   else if(done>=25 && done<50) note='¡Van tomando forma nuestros recuerdos! ✨';
   else if(done>=50 && done<75) note='¡Ya completaste más de la mitad! 💜';
   else if(done>=75 && done<100) note='¡Queda poquito! 🎉';
   else if(done>=100) note='¡100 retos completados! 🥂';
-  document.getElementById('progressNote').textContent=note;
+
+  el('progressNote').textContent=note;
 }
-document.addEventListener('input',e=>{
-  if(e.target.id==='search') renderRetos();
-});
+
 function openCapture(id){
   currentReto=id;
-
-  const card=document.querySelector('.reto-card[data-id="'+id+'"]');
+  const card=document.querySelector(`.reto-card[data-id="${id}"]`);
   if(!card) return;
 
-  const retosView=document.getElementById('retos');
-  const detail=document.getElementById('challengeDetail');
+  hideAllMainViews();
 
-  document.getElementById('detailNumber').textContent=id;
-  document.getElementById('detailTitle').textContent=
-    card.querySelector('h3').textContent;
+  el('detailNumber').textContent=id;
+  el('detailTitle').textContent=card.querySelector('h3').textContent;
 
-  if(retosView) retosView.style.display='none';
-
+  const detail=el('challengeDetail');
   detail.classList.add('open');
   detail.setAttribute('aria-hidden','false');
 
   renderDetailGallery(id);
   window.scrollTo({top:0,behavior:'instant'});
 }
-function hideSheet(){document.getElementById('captureSheet').classList.remove('open')}
-function closeCapture(e){if(e.target.id==='captureSheet') hideSheet()}
-function demoChoice(tipo){
-  demoRealizados.add(currentReto);
-  hideSheet();
-  renderRetos();
-  alert('Vista de demostración: aquí continuaremos con la captura/subida de ' + tipo + '.');
-}
-
-
-let sorteando=false;
 
 function closeChallengeDetail(){
-  const detail=document.getElementById('challengeDetail');
-  const retosView=document.getElementById('retos');
-
-  detail.classList.remove('open');
-  detail.setAttribute('aria-hidden','true');
-
-  if(retosView) retosView.style.display='block';
-
+  showRetos();
   requestAnimationFrame(()=>{
-    const card=document.querySelector('.reto-card[data-id="'+currentReto+'"]');
+    const card=document.querySelector(`.reto-card[data-id="${currentReto}"]`);
     if(card) card.scrollIntoView({behavior:'instant',block:'center'});
   });
 }
 
 function renderDetailGallery(id){
-  /*
-    En esta etapa la galería está vacía a propósito.
-    La siguiente conexión leerá RECUERDOS_RELIGIOSO filtrando por
-    ID_SESION + ID_RETO.
-  */
   const recuerdos=[];
-  const gallery=document.getElementById('detailGallery');
-  const count=document.getElementById('detailGalleryCount');
-
-  count.textContent=recuerdos.length===1 ? '1 recuerdo' : recuerdos.length+' recuerdos';
+  el('detailGalleryCount').textContent=
+    recuerdos.length===1?'1 recuerdo':`${recuerdos.length} recuerdos`;
 
   if(!recuerdos.length){
-    gallery.innerHTML=
+    el('detailGallery').innerHTML=
       '<div class="emptyGallery">'+
-        '<div class="emptyIcon">🌸</div>'+
-        '<strong>Aún no tienes recuerdos aquí</strong>'+
-        '<p>Cuando subas una foto o video para este reto, aparecerá en esta galería.</p>'+
+      '<div class="emptyIcon">🌸</div>'+
+      '<strong>Aún no tienes recuerdos aquí</strong>'+
+      '<p>Cuando subas una foto o video para este reto, aparecerá en esta galería.</p>'+
       '</div>';
-    return;
   }
-}
-
-function detailActionDemo(tipo){
-  alert(
-    'La interfaz ya está lista 💜\\n\\n'+
-    'Siguiente etapa: conectaremos "'+tipo+'" con la captura/subida real y la vista previa antes de guardar.'
-  );
 }
 
 function retoAleatorio(){
   if(sorteando) return;
 
-  // Ignore search/filter for the draw: use all challenges not yet completed by this guest.
-  let pool=[...document.querySelectorAll('.reto-card')].filter(card=>!demoRealizados.has(card.dataset.id));
+  let pool=[...document.querySelectorAll('.reto-card')]
+    .filter(card=>!demoRealizados.has(card.dataset.id));
   if(!pool.length) pool=[...document.querySelectorAll('.reto-card')];
   if(!pool.length) return;
 
@@ -1123,12 +1293,13 @@ function retoAleatorio(){
   const original=btn.innerHTML;
   btn.disabled=true;
 
-  // Slot-style changing numbers, progressively slowing down.
   const delays=[70,70,80,90,105,120,140,165,195,230,280,340];
   let i=0;
+
   function spin(){
     const sample=pool[Math.floor(Math.random()*pool.length)];
     btn.innerHTML='🎲 &nbsp; Reto '+sample.dataset.id;
+
     if(i<delays.length){
       setTimeout(spin,delays[i++]);
       return;
@@ -1137,15 +1308,16 @@ function retoAleatorio(){
     const elegido=pool[Math.floor(Math.random()*pool.length)];
     btn.innerHTML='✨ &nbsp; Reto '+elegido.dataset.id;
 
-    // Return to "Todos", clear search, and reveal the selected card.
     currentFilter='todos';
-    document.querySelectorAll('.chip').forEach(x=>x.classList.toggle('on',x.dataset.filter==='todos'));
-    const search=document.getElementById('search');
-    if(search) search.value='';
+    document.querySelectorAll('.chip')
+      .forEach(x=>x.classList.toggle('on',x.dataset.filter==='todos'));
+
+    if(el('search')) el('search').value='';
     renderRetos();
 
     elegido.classList.remove('randomFlash');
     elegido.scrollIntoView({behavior:'smooth',block:'center'});
+
     setTimeout(()=>{
       elegido.classList.add('randomFlash');
       sorteando=false;
@@ -1153,209 +1325,122 @@ function retoAleatorio(){
       setTimeout(()=>{btn.innerHTML=original;},1400);
     },500);
   }
+
   spin();
 }
 
+/* ===== BANDEJA MÚLTIPLE ===== */
+function chooseMedia(source,context){
+  trayContext=context;
 
-/* ============================================================
-   RECUERDO LIBRE + PRUEBA DE SUBIDA EN SEGUNDO PLANO
-============================================================ */
+  let input=null;
+  if(source==='gallery') input=el('galleryInput');
+  if(source==='camera') input=el('cameraInput');
+  if(source==='video') input=el('videoInput');
 
-const RECUERDOS_API =
-  'https://script.google.com/macros/s/AKfycbzGZxguZB-diYDtcI1q0Vsx0aTgd42Lvi31JQnr0o_42ckNY8qagSaOMrIsxmTQ4IJdug/exec';
-
-let selectedFreeFile = null;
-
-function getSessionId(){
-  let id=localStorage.getItem('FA_ID_SESION_RELIGIOSO');
-  if(!id){
-    id='SES-'+Date.now()+'-'+Math.random().toString(36).slice(2,10).toUpperCase();
-    localStorage.setItem('FA_ID_SESION_RELIGIOSO',id);
-  }
-  return id;
-}
-
-function openFreeMemory(){
-  const retos=document.getElementById('retos');
-  const detail=document.getElementById('challengeDetail');
-  const free=document.getElementById('freeMemoryView');
-
-  if(retos) retos.style.display='none';
-  if(detail){
-    detail.classList.remove('open');
-    detail.setAttribute('aria-hidden','true');
-  }
-  free.classList.add('open');
-  free.setAttribute('aria-hidden','false');
-  window.scrollTo({top:0,behavior:'instant'});
-}
-
-function closeFreeMemory(){
-  clearUploadPreview();
-  const free=document.getElementById('freeMemoryView');
-  free.classList.remove('open');
-  free.setAttribute('aria-hidden','true');
-
-  /* Volvemos a la portada si existe; si no, mostramos la lista */
-  const portada =
-    document.getElementById('portada') ||
-    document.querySelector('.cover') ||
-    document.querySelector('.portada');
-
-  if(portada){
-    portada.style.display='';
-    window.scrollTo({top:0,behavior:'instant'});
-  }else{
-    const retos=document.getElementById('retos');
-    if(retos) retos.style.display='block';
-    window.scrollTo({top:0,behavior:'instant'});
-  }
-}
-
-function openFreePicker(mode){
-  const input=document.getElementById(
-    mode==='camera' ? 'freeCameraInput' : 'freePhotoInput'
-  );
+  if(!input) return;
   input.value='';
   input.click();
 }
 
-function freeVideoDemo(){
-  alert('La grabación de video la conectaremos después de confirmar que la subida de foto funciona sin salir de GitHub 💜');
+function receiveFiles(fileList){
+  const files=Array.from(fileList||[]);
+  if(!files.length) return;
+
+  files.forEach(file=>{
+    trayFiles.push({
+      id:Date.now()+'-'+Math.random().toString(36).slice(2),
+      file:file
+    });
+  });
+
+  renderTray();
 }
 
-function prepareFreePreview(file){
-  if(!file) return;
-  selectedFreeFile=file;
+function renderTray(){
+  const tray=el('tray-'+trayContext);
+  if(!tray) return;
 
-  const reader=new FileReader();
-  reader.onload=()=>{
-    document.getElementById('uploadPreviewImage').src=reader.result;
-    document.getElementById('uploadPreview').classList.add('open');
-    setUploadStatus('');
-  };
-  reader.readAsDataURL(file);
-}
-
-function clearUploadPreview(){
-  selectedFreeFile=null;
-  const box=document.getElementById('uploadPreview');
-  const img=document.getElementById('uploadPreviewImage');
-  if(box) box.classList.remove('open');
-  if(img) img.removeAttribute('src');
-  setUploadStatus('');
-}
-
-function setUploadStatus(message){
-  const el=document.getElementById('uploadStatus');
-  if(!el) return;
-  el.textContent=message || '';
-  el.classList.toggle('show',Boolean(message));
-}
-
-async function uploadTestMemory(){
-  if(!selectedFreeFile){
-    setUploadStatus('Primero selecciona una foto.');
+  if(!trayFiles.length){
+    tray.classList.remove('open');
+    tray.innerHTML='';
     return;
   }
 
-  setUploadStatus('Subiendo recuerdo… 💜');
+  tray.classList.add('open');
+  tray.innerHTML=
+    `<div class="trayTitle">${trayFiles.length} ${
+      trayFiles.length===1?'recuerdo preparado':'recuerdos preparados'
+    }</div>`+
+    `<div id="trayGrid-${trayContext}" class="trayGrid"></div>`+
+    `<button class="trayButton trayMore" type="button" onclick="chooseMedia('gallery','${trayContext}')">＋ Agregar más desde galería</button>`+
+    `<button class="trayButton" type="button" onclick="submitTray()">💜 SUBIR ${trayFiles.length} ${
+      trayFiles.length===1?'RECUERDO':'RECUERDOS'
+    }</button>`;
 
-  try{
-    const dataUrl=await fileToDataURL(selectedFreeFile);
-    const base64=dataUrl.split(',')[1];
+  const grid=el('trayGrid-'+trayContext);
 
-    const body=new URLSearchParams();
-    body.set('accion','recuerdoReligioso');
-    body.set('idSesion',getSessionId());
-    body.set('idReto','');
-    body.set('tipo','foto');
-    body.set('nombreArchivo',selectedFreeFile.name || ('recuerdo_'+Date.now()+'.jpg'));
-    body.set('mimeType',selectedFreeFile.type || 'image/jpeg');
-    body.set('archivoBase64',base64);
+  trayFiles.forEach(item=>{
+    const tile=document.createElement('div');
+    tile.className='trayItem';
 
-    const response=await fetch(RECUERDOS_API,{
-      method:'POST',
-      headers:{'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8'},
-      body:body.toString(),
-      redirect:'follow'
-    });
+    const url=URL.createObjectURL(item.file);
 
-    const text=await response.text();
-    let result;
-    try{ result=JSON.parse(text); }
-    catch(_){ throw new Error('La respuesta del servidor no llegó como JSON.'); }
+    if(item.file.type.startsWith('video/')){
+      const video=document.createElement('video');
+      video.src=url;
+      video.muted=true;
+      video.playsInline=true;
+      tile.appendChild(video);
 
-    if(!result.ok){
-      throw new Error(result.error || 'No se pudo guardar el recuerdo.');
+      const mark=document.createElement('span');
+      mark.className='trayVideo';
+      mark.textContent='▶ VIDEO';
+      tile.appendChild(mark);
+    }else{
+      const img=document.createElement('img');
+      img.src=url;
+      img.alt='Vista previa';
+      tile.appendChild(img);
     }
 
-    setUploadStatus('¡Recuerdo guardado! 🌸 Seguimos dentro de la aplicación.');
-  }catch(error){
-    console.error(error);
-    setUploadStatus(
-      'La prueba no pudo completarse: '+(error.message || error)+
-      ' — seguimos en GitHub.'
-    );
-  }
-}
+    const remove=document.createElement('button');
+    remove.className='trayRemove';
+    remove.type='button';
+    remove.textContent='×';
+    remove.onclick=()=>removeTrayItem(item.id);
+    tile.appendChild(remove);
 
-function fileToDataURL(file){
-  return new Promise((resolve,reject)=>{
-    const reader=new FileReader();
-    reader.onload=()=>resolve(reader.result);
-    reader.onerror=()=>reject(new Error('No se pudo leer la foto.'));
-    reader.readAsDataURL(file);
+    grid.appendChild(tile);
   });
 }
 
-document.addEventListener('DOMContentLoaded',()=>{
-  getSessionId();
+function removeTrayItem(id){
+  trayFiles=trayFiles.filter(x=>x.id!==id);
+  renderTray();
+}
 
-  const gallery=document.getElementById('freePhotoInput');
-  const camera=document.getElementById('freeCameraInput');
+function submitTray(){
+  alert(
+    `Bandeja lista 💜\n\nTienes ${trayFiles.length} ${
+      trayFiles.length===1?'recuerdo preparado.':'recuerdos preparados.'
+    }\n\nTodavía no los enviaremos a Drive hasta terminar esta prueba de interfaz.`
+  );
+}
 
-  if(gallery){
-    gallery.addEventListener('change',e=>{
-      prepareFreePreview(e.target.files && e.target.files[0]);
-    });
-  }
-  if(camera){
-    camera.addEventListener('change',e=>{
-      prepareFreePreview(e.target.files && e.target.files[0]);
-    });
-  }
+document.addEventListener('input',e=>{
+  if(e.target.id==='search') renderRetos();
 });
 
+document.addEventListener('DOMContentLoaded',()=>{
+  ['galleryInput','cameraInput','videoInput'].forEach(id=>{
+    const input=el(id);
+    if(input){
+      input.addEventListener('change',e=>receiveFiles(e.target.files));
+    }
+  });
 
-function setBottomNav(active){
-  const a=document.getElementById('navRetos');
-  const b=document.getElementById('navRecuerdos');
-  if(a) a.classList.toggle('on',active==='retos');
-  if(b) b.classList.toggle('on',active==='recuerdos');
-}
-
-function showRetos(){
-  const retosContent=document.querySelector('#retos > .scroll');
-  const panel=document.getElementById('myMemoriesPanel');
-
-  if(panel) panel.style.display='none';
-  if(retosContent) retosContent.style.display='block';
-
-  setBottomNav('retos');
-  window.scrollTo({top:0,behavior:'smooth'});
-}
-
-function showMyMemories(){
-  const retosContent=document.querySelector('#retos > .scroll');
-  const panel=document.getElementById('myMemoriesPanel');
-
-  if(retosContent) retosContent.style.display='none';
-  if(panel) panel.style.display='block';
-
-  setBottomNav('recuerdos');
-  window.scrollTo({top:0,behavior:'smooth'});
-}
-
+  showHome();
+});
 </script>
 </body></html>
