@@ -1,3 +1,81 @@
+
+Cargando mensajes anteriores…
+me dice que tiene error de sintaxis
+
+Sí 😭 encontré el problema. Fue del archivo que te generé, no de tu Apps Script.
+
+El código que me habías enviado estaba almacenado como Markdown y al reconstruirlo quedaron caracteres escapados como /*, los backticks de los HTML, etc. Apps Script los interpreta como sintaxis inválida.
+
+Ya lo corregí y verifiqué que conserva doGet, doPost, guardarConfesion_ y nuestro nuevo action === 'retos'.
+
+👉
+Descargar código completo CORREGIDO
+
+Haz solo esto ahora: reemplaza el contenido del archivo principal del Confesionario por esta versión corregida y pulsa Guardar.
+
+RETOS_RELIGIOSO.gs no lo toques.
+
+Si esta vez guarda sin error de sintaxis, me dices “guardó” y seguimos. 💜
+Confesionario_COMPLETO_CORREGIDO.gs.txtDocumento
+listo!
+
+¡Perfecto! 💜 Entonces ya tenemos:
+
+Confesionario intacto + RETOS_RELIGIOSO.gs separado + doGet preparado para leer los retos.
+
+Ahora toca actualizar la implementación, porque guardar el código no actualiza automáticamente el /exec que está publicado.
+
+Ve a Implementar → Administrar implementaciones → ✏️ Editar. En Versión, selecciona Nueva versión y pulsa Implementar. No crees una implementación distinta; queremos conservar el mismo /exec que ya utiliza el Confesionario.
+
+Cuando termine, prueba directamente:
+
+🧪 Probar RETOS_RELIGIOSO
+
+Tiene que aparecer algo parecido a:
+
+{"ok":true,"total":100,"retos":[{"id":"001","reto":"Captura un beso...
+
+No importa que salga una línea gigantesca 😂. Solo fíjate en que diga:
+
+"ok":true
+"total":100
+
+Si sale eso, ya tendremos Sheets → Apps Script funcionando públicamente y nos vamos directo a conectar la interfaz de Nuestros Recuerdos. 🌸
+siii si sale
+
+¡SÍÍÍ! 😂💜 Entonces tenemos oficialmente la primera conexión funcionando:
+
+RETOS_RELIGIOSO (Sheets) → Apps Script → Internet ✅
+
+Y lo mejor es que el Confesionario sigue usando su mismo backend; solo añadimos una nueva acción al doGet existente.
+
+Ahora viene la parte entretenida: hacer que Nuestros Recuerdos deje de depender de los 100 retos escritos dentro del HTML y los cargue desde Sheets.
+
+Pero antes de modificarlo necesito trabajar sobre el index.html exacto que tienes publicado ahora mismo, porque ese es el que ya comprobamos que tiene funcionando correctamente ▶ Dale play, diseño, logo, fondo y navegación.
+
+👉 Súbeme aquí el index.html que actualmente tienes en el repositorio nuestros-recuerdos-matrimonio.
+
+Con ese archivo te devolveré el index.html completo actualizado, no trocitos 😌. La primera modificación será únicamente:
+
+Abrir web → consultar ?action=retos → recibir los 100 → generar las tarjetas → buscador/filtros/Dale play funcionan con esos datos.
+
+Todavía no tocaremos Capturar en ese cambio. Una vez comprobemos que los retos siguen apareciendo y Dale play continúa funcionando, pasamos a construir la nueva galería de cada reto que definimos. 🌸
+Texto pegado.txtDocumento
+
+¡Perfecto! 💜 Ya tomé el archivo exacto que me enviaste, que es la versión publicada con el diseño, las tarjetas, el buscador y Dale play.
+
+Te preparé el HTML completo actualizado:
+
+En esta versión hice solo lo que acordamos: los retos ya se cargan desde RETOS_RELIGIOSO mediante Apps Script; se mantienen buscador, filtros y ▶ Dale play; y corregí el comportamiento provisional para que presionar Capturar o una opción de foto/video NO marque el reto como realizado. Eso ocurrirá más adelante únicamente cuando el archivo se haya guardado correctamente.
+
+Ahora en GitHub reemplaza el contenido de tu index.html por todo el contenido de este archivo, haz Commit changes, espera unos segundos y abre nuevamente:
+
+Nuestros Recuerdos F+A
+
+La prueba de esta etapa es sencilla: deben aparecer nuevamente los 100 retos, debe funcionar el buscador y Dale play, y al tocar Capturar → Sacar foto/video/galería, el reto ya no debe pasar a realizado.
+
+Si esas cuatro cosas funcionan, nos vamos inmediatamente a construir la nueva pantalla de cada reto con su galería tipo celular. 🌸
+Nuestros_Recuerdos_index_Sheets.htmlHTML
 <!doctype html>
 <html lang="es">
 <head>
@@ -193,506 +271,7 @@ body:has(#retos:target) #cover{display:none}
    </div>
 
    <div id="countline" class="countline">100 retos disponibles</div>
-   <div id="cards"><article class="card reto-card" data-id="001" data-text="captura un beso de los recién casados 💋">
-      <div class="num">001</div>
-      <h3>Captura un beso de los recién casados 💋</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('001', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="002" data-text="fotografía a los novios mirándose cuando crean que nadie los está viendo">
-      <div class="num">002</div>
-      <h3>Fotografía a los novios mirándose cuando crean que nadie los está viendo</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('002', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="003" data-text="captura a uno de los novios riéndose a carcajadas">
-      <div class="num">003</div>
-      <h3>Captura a uno de los novios riéndose a carcajadas</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('003', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="004" data-text="consigue una selfie con los recién casados">
-      <div class="num">004</div>
-      <h3>Consigue una selfie con los recién casados</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('004', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="005" data-text="captura a los novios bailando juntos">
-      <div class="num">005</div>
-      <h3>Captura a los novios bailando juntos</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('005', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="006" data-text="fotografía a uno de los novios conversando con un invitado">
-      <div class="num">006</div>
-      <h3>Fotografía a uno de los novios conversando con un invitado</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('006', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="007" data-text="captura un momento espontáneo de los novios">
-      <div class="num">007</div>
-      <h3>Captura un momento espontáneo de los novios</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('007', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="008" data-text="fotografía a los novios desde un ángulo creativo">
-      <div class="num">008</div>
-      <h3>Fotografía a los novios desde un ángulo creativo</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('008', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="009" data-text="captura a los novios tomados de la mano sin que estén posando">
-      <div class="num">009</div>
-      <h3>Captura a los novios tomados de la mano sin que estén posando</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('009', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="010" data-text="graba 10 segundos de los novios disfrutando de su fiesta">
-      <div class="num">010</div>
-      <h3>Graba 10 segundos de los novios disfrutando de su fiesta</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('010', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="011" data-text="fotografía a alguien emocionándose 🥹">
-      <div class="num">011</div>
-      <h3>Fotografía a alguien emocionándose 🥹</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('011', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="012" data-text="captura el abrazo más bonito que encuentres">
-      <div class="num">012</div>
-      <h3>Captura el abrazo más bonito que encuentres</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('012', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="013" data-text="fotografía a dos personas riéndose juntas">
-      <div class="num">013</div>
-      <h3>Fotografía a dos personas riéndose juntas</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('013', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="014" data-text="encuentra a alguien que esté pasándolo demasiado bien y demuéstralo">
-      <div class="num">014</div>
-      <h3>Encuentra a alguien que esté pasándolo demasiado bien y demuéstralo</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('014', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="015" data-text="fotografía una conversación que parezca muy interesante">
-      <div class="num">015</div>
-      <h3>Fotografía una conversación que parezca muy interesante</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('015', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="016" data-text="captura una amistad de muchos años">
-      <div class="num">016</div>
-      <h3>Captura una amistad de muchos años</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('016', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="017" data-text="fotografía a dos personas que se hayan conocido hoy">
-      <div class="num">017</div>
-      <h3>Fotografía a dos personas que se hayan conocido hoy</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('017', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="018" data-text="captura a alguien mirando a los novios con cariño">
-      <div class="num">018</div>
-      <h3>Captura a alguien mirando a los novios con cariño</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('018', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="019" data-text="fotografía a alguien que no pueda parar de reír">
-      <div class="num">019</div>
-      <h3>Fotografía a alguien que no pueda parar de reír</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('019', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="020" data-text="captura un momento que creas que los novios no alcanzaron a ver 👀">
-      <div class="num">020</div>
-      <h3>Captura un momento que creas que los novios no alcanzaron a ver 👀</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('020', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="021" data-text="consigue una foto con alguien que conociste hoy">
-      <div class="num">021</div>
-      <h3>Consigue una foto con alguien que conociste hoy</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('021', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="022" data-text="junta a alguien de la familia de la novia con alguien de la familia del novio">
-      <div class="num">022</div>
-      <h3>Junta a alguien de la familia de la novia con alguien de la familia del novio</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('022', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="023" data-text="consigue una selfie con alguien mayor que tú">
-      <div class="num">023</div>
-      <h3>Consigue una selfie con alguien mayor que tú</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('023', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="024" data-text="consigue una selfie con alguien menor que tú">
-      <div class="num">024</div>
-      <h3>Consigue una selfie con alguien menor que tú</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('024', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="025" data-text="encuentra a alguien que conozca a uno de los novios desde hace más de 10 años">
-      <div class="num">025</div>
-      <h3>Encuentra a alguien que conozca a uno de los novios desde hace más de 10 años</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('025', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="026" data-text="reúne a tres generaciones en una misma foto">
-      <div class="num">026</div>
-      <h3>Reúne a tres generaciones en una misma foto</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('026', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="027" data-text="fotografía a un grupo de amigos de la novia">
-      <div class="num">027</div>
-      <h3>Fotografía a un grupo de amigos de la novia</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('027', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="028" data-text="fotografía a un grupo de amigos del novio">
-      <div class="num">028</div>
-      <h3>Fotografía a un grupo de amigos del novio</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('028', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="029" data-text="junta en una foto a personas que normalmente no fotografiarías juntas">
-      <div class="num">029</div>
-      <h3>Junta en una foto a personas que normalmente no fotografiarías juntas</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('029', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="030" data-text="haz una foto grupal improvisada con al menos 5 personas">
-      <div class="num">030</div>
-      <h3>Haz una foto grupal improvisada con al menos 5 personas</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('030', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="031" data-text="captura el mejor paso de baile de la noche 🕺">
-      <div class="num">031</div>
-      <h3>Captura el mejor paso de baile de la noche 🕺</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('031', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="032" data-text="graba el baile más intenso que encuentres">
-      <div class="num">032</div>
-      <h3>Graba el baile más intenso que encuentres</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('032', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="033" data-text="fotografía a alguien bailando como si nadie estuviera mirando">
-      <div class="num">033</div>
-      <h3>Fotografía a alguien bailando como si nadie estuviera mirando</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('033', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="034" data-text="consigue que tres personas hagan el mismo paso de baile">
-      <div class="num">034</div>
-      <h3>Consigue que tres personas hagan el mismo paso de baile</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('034', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="035" data-text="captura a alguien cantando una canción a todo pulmón">
-      <div class="num">035</div>
-      <h3>Captura a alguien cantando una canción a todo pulmón</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('035', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="036" data-text="graba 10 segundos de la pista cuando esté llena">
-      <div class="num">036</div>
-      <h3>Graba 10 segundos de la pista cuando esté llena</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('036', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="037" data-text="fotografía al grupo que más energía tenga en la pista">
-      <div class="num">037</div>
-      <h3>Fotografía al grupo que más energía tenga en la pista</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('037', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="038" data-text="captura el paso de baile más cuestionable de la noche 😂">
-      <div class="num">038</div>
-      <h3>Captura el paso de baile más cuestionable de la noche 😂</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('038', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="039" data-text="haz una selfie en plena pista de baile">
-      <div class="num">039</div>
-      <h3>Haz una selfie en plena pista de baile</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('039', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="040" data-text="graba un mini videoclip de máximo 10 segundos con otros invitados">
-      <div class="num">040</div>
-      <h3>Graba un mini videoclip de máximo 10 segundos con otros invitados</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('040', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="041" data-text="captura un brindis 🥂">
-      <div class="num">041</div>
-      <h3>Captura un brindis 🥂</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('041', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="042" data-text="fotografía dos copas chocando">
-      <div class="num">042</div>
-      <h3>Fotografía dos copas chocando</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('042', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="043" data-text="fotografía el plato o bocadito que más te gustó">
-      <div class="num">043</div>
-      <h3>Fotografía el plato o bocadito que más te gustó</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('043', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="044" data-text="captura a alguien disfrutando mucho de la comida">
-      <div class="num">044</div>
-      <h3>Captura a alguien disfrutando mucho de la comida</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('044', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="045" data-text="fotografía el brindis más elegante que puedas conseguir">
-      <div class="num">045</div>
-      <h3>Fotografía el brindis más elegante que puedas conseguir</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('045', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="046" data-text="haz una foto creativa de una copa con la fiesta de fondo">
-      <div class="num">046</div>
-      <h3>Haz una foto creativa de una copa con la fiesta de fondo</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('046', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="047" data-text="captura el momento de la torta 🍰">
-      <div class="num">047</div>
-      <h3>Captura el momento de la torta 🍰</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('047', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="048" data-text="fotografía a alguien probando algo que le encantó">
-      <div class="num">048</div>
-      <h3>Fotografía a alguien probando algo que le encantó</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('048', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="049" data-text="captura una mesa completa brindando">
-      <div class="num">049</div>
-      <h3>Captura una mesa completa brindando</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('049', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="050" data-text="graba un brindis espontáneo de máximo 10 segundos para los novios">
-      <div class="num">050</div>
-      <h3>Graba un brindis espontáneo de máximo 10 segundos para los novios</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('050', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="051" data-text="fotografía tu detalle favorito de la decoración">
-      <div class="num">051</div>
-      <h3>Fotografía tu detalle favorito de la decoración</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('051', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="052" data-text="captura las flores que más te gustaron 🌸">
-      <div class="num">052</div>
-      <h3>Captura las flores que más te gustaron 🌸</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('052', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="053" data-text="haz una foto bonita de las argollas si tienes la oportunidad 💍">
-      <div class="num">053</div>
-      <h3>Haz una foto bonita de las argollas si tienes la oportunidad 💍</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('053', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="054" data-text="fotografía un detalle que creas que podría pasar desapercibido">
-      <div class="num">054</div>
-      <h3>Fotografía un detalle que creas que podría pasar desapercibido</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('054', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="055" data-text="captura una foto donde se vea el ambiente completo de la celebración">
-      <div class="num">055</div>
-      <h3>Captura una foto donde se vea el ambiente completo de la celebración</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('055', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="056" data-text="fotografía algo que represente perfectamente esta boda">
-      <div class="num">056</div>
-      <h3>Fotografía algo que represente perfectamente esta boda</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('056', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="057" data-text="busca el rincón más bonito de la celebración y fotografíalo">
-      <div class="num">057</div>
-      <h3>Busca el rincón más bonito de la celebración y fotografíalo</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('057', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="058" data-text="captura un detalle de los novios sin mostrar sus caras">
-      <div class="num">058</div>
-      <h3>Captura un detalle de los novios sin mostrar sus caras</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('058', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="059" data-text="haz una foto digna de fondo de pantalla">
-      <div class="num">059</div>
-      <h3>Haz una foto digna de fondo de pantalla</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('059', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="060" data-text="fotografía algo que quieras que los novios recuerden de cómo se veía este día">
-      <div class="num">060</div>
-      <h3>Fotografía algo que quieras que los novios recuerden de cómo se veía este día</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('060', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="061" data-text="haz la selfie más absurda que puedas 😂">
-      <div class="num">061</div>
-      <h3>Haz la selfie más absurda que puedas 😂</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('061', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="062" data-text="consigue una foto con alguien haciendo una cara ridícula">
-      <div class="num">062</div>
-      <h3>Consigue una foto con alguien haciendo una cara ridícula</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('062', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="063" data-text="reúne a 4 personas para hacer exactamente la misma pose">
-      <div class="num">063</div>
-      <h3>Reúne a 4 personas para hacer exactamente la misma pose</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('063', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="064" data-text="recrea una pose de foto familiar incómoda">
-      <div class="num">064</div>
-      <h3>Recrea una pose de foto familiar incómoda</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('064', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="065" data-text="haz una foto fingiendo que estás en una portada de revista">
-      <div class="num">065</div>
-      <h3>Haz una foto fingiendo que estás en una portada de revista</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('065', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="066" data-text="encuentra a alguien dispuesto a hacer una pose dramática contigo">
-      <div class="num">066</div>
-      <h3>Encuentra a alguien dispuesto a hacer una pose dramática contigo</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('066', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="067" data-text="haz una foto que, sin contexto, sea imposible de explicar">
-      <div class="num">067</div>
-      <h3>Haz una foto que, sin contexto, sea imposible de explicar</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('067', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="068" data-text="captura la expresión más divertida que encuentres">
-      <div class="num">068</div>
-      <h3>Captura la expresión más divertida que encuentres</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('068', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="069" data-text="haz una foto que parezca un meme">
-      <div class="num">069</div>
-      <h3>Haz una foto que parezca un meme</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('069', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="070" data-text="graba 5 segundos de algo completamente absurdo que esté ocurriendo">
-      <div class="num">070</div>
-      <h3>Graba 5 segundos de algo completamente absurdo que esté ocurriendo</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('070', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="071" data-text="graba a alguien diciendo en una palabra cómo describiría a los recién casados">
-      <div class="num">071</div>
-      <h3>Graba a alguien diciendo en una palabra cómo describiría a los recién casados</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('071', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="072" data-text="pídele a alguien un consejo matrimonial de máximo 10 segundos">
-      <div class="num">072</div>
-      <h3>Pídele a alguien un consejo matrimonial de máximo 10 segundos</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('072', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="073" data-text="pregunta a un invitado: “¿quién manda en esta relación?” 😂">
-      <div class="num">073</div>
-      <h3>Pregunta a un invitado: “¿Quién manda en esta relación?” 😂</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('073', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="074" data-text="pregunta a alguien cuál cree que será la primera discusión absurda de casados">
-      <div class="num">074</div>
-      <h3>Pregunta a alguien cuál cree que será la primera discusión absurda de casados</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('074', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="075" data-text="graba a alguien completando: “un matrimonio feliz necesita…”">
-      <div class="num">075</div>
-      <h3>Graba a alguien completando: “Un matrimonio feliz necesita…”</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('075', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="076" data-text="pregunta a alguien dónde imagina a los novios dentro de 10 años">
-      <div class="num">076</div>
-      <h3>Pregunta a alguien dónde imagina a los novios dentro de 10 años</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('076', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="077" data-text="graba a alguien contando en máximo 15 segundos cómo conoció a uno de los novios">
-      <div class="num">077</div>
-      <h3>Graba a alguien contando en máximo 15 segundos cómo conoció a uno de los novios</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('077', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="078" data-text="pídele a alguien que mande un saludo a los novios del futuro">
-      <div class="num">078</div>
-      <h3>Pídele a alguien que mande un saludo a los novios del futuro</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('078', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="079" data-text="graba a dos invitados dando juntos un consejo terrible para el matrimonio 😂">
-      <div class="num">079</div>
-      <h3>Graba a dos invitados dando juntos un consejo terrible para el matrimonio 😂</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('079', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="080" data-text="entrevista a alguien con la pregunta que tú quieras 🎤">
-      <div class="num">080</div>
-      <h3>Entrevista a alguien con la pregunta que tú quieras 🎤</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('080', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="081" data-text="fotografía a alguien que creas que será de los últimos en abandonar la fiesta">
-      <div class="num">081</div>
-      <h3>Fotografía a alguien que creas que será de los últimos en abandonar la fiesta</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('081', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="082" data-text="encuentra al invitado con el look más llamativo y pídele una foto">
-      <div class="num">082</div>
-      <h3>Encuentra al invitado con el look más llamativo y pídele una foto</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('082', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="083" data-text="encuentra los zapatos más interesantes de la fiesta 👠👞">
-      <div class="num">083</div>
-      <h3>Encuentra los zapatos más interesantes de la fiesta 👠👞</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('083', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="084" data-text="fotografía a alguien que haya venido desde lejos para estar aquí">
-      <div class="num">084</div>
-      <h3>Fotografía a alguien que haya venido desde lejos para estar aquí</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('084', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="085" data-text="encuentra a dos personas vestidas de colores similares y júntalas">
-      <div class="num">085</div>
-      <h3>Encuentra a dos personas vestidas de colores similares y júntalas</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('085', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="086" data-text="captura al invitado más elegante que encuentres">
-      <div class="num">086</div>
-      <h3>Captura al invitado más elegante que encuentres</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('086', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="087" data-text="fotografía a alguien descansando después de darlo todo en la pista 😂">
-      <div class="num">087</div>
-      <h3>Fotografía a alguien descansando después de darlo todo en la pista 😂</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('087', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="088" data-text="encuentra a alguien que todavía esté impecable después de horas de fiesta">
-      <div class="num">088</div>
-      <h3>Encuentra a alguien que todavía esté impecable después de horas de fiesta</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('088', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="089" data-text="captura a alguien ayudando o cuidando a otro invitado 💜">
-      <div class="num">089</div>
-      <h3>Captura a alguien ayudando o cuidando a otro invitado 💜</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('089', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="090" data-text="fotografía a alguien disfrutando tranquilamente mientras alrededor reina el caos">
-      <div class="num">090</div>
-      <h3>Fotografía a alguien disfrutando tranquilamente mientras alrededor reina el caos</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('090', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="091" data-text="captura tu momento favorito de toda la celebración ❤️">
-      <div class="num">091</div>
-      <h3>Captura tu momento favorito de toda la celebración ❤️</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('091', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="092" data-text="fotografía a las personas con quienes compartiste más durante la fiesta">
-      <div class="num">092</div>
-      <h3>Fotografía a las personas con quienes compartiste más durante la fiesta</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('092', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="093" data-text="tómate una foto que quieras que los novios conserven">
-      <div class="num">093</div>
-      <h3>Tómate una foto que quieras que los novios conserven</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('093', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="094" data-text="captura algo que te haya hecho feliz esta noche">
-      <div class="num">094</div>
-      <h3>Captura algo que te haya hecho feliz esta noche</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('094', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="095" data-text="fotografía algo que te gustaría recordar dentro de 10 años">
-      <div class="num">095</div>
-      <h3>Fotografía algo que te gustaría recordar dentro de 10 años</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('095', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="096" data-text="captura el momento más tierno que encuentres">
-      <div class="num">096</div>
-      <h3>Captura el momento más tierno que encuentres</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('096', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="097" data-text="fotografía el momento más caótico de la noche 😂">
-      <div class="num">097</div>
-      <h3>Fotografía el momento más caótico de la noche 😂</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('097', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="098" data-text="captura una imagen que resuma esta celebración sin mostrar a los novios">
-      <div class="num">098</div>
-      <h3>Captura una imagen que resuma esta celebración sin mostrar a los novios</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('098', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="099" data-text="📸 reto libre: captura el recuerdo que tú quieras dejarles a los recién casados">
-      <div class="num">099</div>
-      <h3>📸 RETO LIBRE: captura el recuerdo que tú quieras dejarles a los recién casados</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('099', this)">Capturar →</button></div>
-    </article>
-<article class="card reto-card" data-id="100" data-text="⭐ reto final: captura una foto o video que creas que los novios sí o sí deberían conservar para siempre">
-      <div class="num">100</div>
-      <h3>⭐ RETO FINAL: captura una foto o video que creas que los novios sí o sí deberían conservar para siempre</h3>
-      <div class="row"><span class="mediahint">📸 Foto · 🎥 Video</span><button class="btn small" onclick="openCapture('100', this)">Capturar →</button></div>
-    </article></div>
+   <div id="cards"></div>
    <div id="empty" class="empty">No encontramos retos con esa búsqueda 🌸</div>
  </div>
  <nav class="bottom"><button class="on">▣<br>Retos</button><button>▧<br>Mis recuerdos</button></nav>
@@ -710,85 +289,188 @@ body:has(#retos:target) #cover{display:none}
 
 </main>
 <script>
+const API_URL = 'https://script.google.com/macros/s/AKfycbzGZxguZB-diYDtcI1q0Vsx0aTgd42Lvi31JQnr0o_42ckNY8qagSaOMrIsxmTQ4IJdug/exec';
 
 let currentFilter='todos';
 let currentReto=null;
+let retos=[];
+let sorteando=false;
+
+// Quedará vacío hasta conectar RECUERDOS_RELIGIOSO.
+// Tocar "Capturar" NO completa un reto.
 const demoRealizados=new Set();
 
 function openApp(){
   document.getElementById('cover').style.display='none';
   document.getElementById('retos').style.display='block';
-  renderRetos();
+  cargarRetos();
 }
+
+function cargarRetos(){
+  const cards=document.getElementById('cards');
+  const countline=document.getElementById('countline');
+
+  cards.innerHTML='<div class="empty" style="display:block">Cargando los retos... 💜</div>';
+  countline.textContent='Cargando retos...';
+
+  const callbackName='recibirRetos_'+Date.now()+'_'+Math.floor(Math.random()*100000);
+  const script=document.createElement('script');
+
+  window[callbackName]=function(respuesta){
+    try{
+      if(!respuesta || respuesta.ok!==true || !Array.isArray(respuesta.retos)){
+        throw new Error('La respuesta del servidor no contiene los retos.');
+      }
+      retos=respuesta.retos;
+      construirTarjetas();
+      renderRetos();
+    }catch(error){
+      mostrarErrorRetos(error);
+    }finally{
+      delete window[callbackName];
+      script.remove();
+    }
+  };
+
+  script.onerror=function(){
+    mostrarErrorRetos(new Error('No pudimos conectarnos con la lista de retos.'));
+    delete window[callbackName];
+    script.remove();
+  };
+
+  script.src=API_URL+'?action=retos&callback='+encodeURIComponent(callbackName)+'&t='+Date.now();
+  document.body.appendChild(script);
+}
+
+function mostrarErrorRetos(error){
+  console.error(error);
+  document.getElementById('cards').innerHTML=
+    '<div class="empty" style="display:block">No pudimos cargar los retos 😢<br><br>'+
+    '<button class="btn" type="button" onclick="cargarRetos()">Intentar nuevamente</button></div>';
+  document.getElementById('countline').textContent='Error al cargar los retos';
+}
+
+function construirTarjetas(){
+  const cards=document.getElementById('cards');
+
+  cards.innerHTML=retos.map(reto=>{
+    const id=escaparHtml(String(reto.id||'').padStart(3,'0'));
+    const texto=escaparHtml(String(reto.reto||''));
+    const textoBusqueda=escaparAtributo(String(reto.reto||'').toLowerCase());
+
+    return '<article class="card reto-card" data-id="'+id+'" data-text="'+textoBusqueda+'">'+
+      '<div class="num">'+id+'</div>'+
+      '<h3>'+texto+'</h3>'+
+      '<div class="row">'+
+        '<span class="mediahint">📸 Foto · 🎥 Video</span>'+
+        '<button class="btn small" type="button" onclick="openCapture(\''+id+'\')">Capturar →</button>'+
+      '</div>'+
+    '</article>';
+  }).join('');
+}
+
+function escaparHtml(texto){
+  return String(texto)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#39;');
+}
+function escaparAtributo(texto){return escaparHtml(texto);}
+
 function setFilter(filter,btn){
   currentFilter=filter;
   document.querySelectorAll('.chip').forEach(x=>x.classList.remove('on'));
   btn.classList.add('on');
   renderRetos();
 }
+
 function renderRetos(){
   const q=(document.getElementById('search')?.value||'').trim().toLowerCase();
   let visibles=0;
+
   document.querySelectorAll('.reto-card').forEach(card=>{
     const matchText=!q || card.dataset.text.includes(q) || card.dataset.id.includes(q);
     const matchFilter=currentFilter==='todos' || demoRealizados.has(card.dataset.id);
     const show=matchText && matchFilter;
+
     card.style.display=show?'block':'none';
     if(show) visibles++;
+
     const done=demoRealizados.has(card.dataset.id);
     const row=card.querySelector('.row');
+
     if(done){
       row.querySelector('.mediahint').innerHTML='✓ Realizado · puedes añadir más';
-      row.querySelector('button').textContent='Añadir →';
+      row.querySelector('button').textContent='Ver recuerdos →';
     }else{
       row.querySelector('.mediahint').innerHTML='📸 Foto · 🎥 Video';
       row.querySelector('button').textContent='Capturar →';
     }
   });
-  document.getElementById('countline').textContent =
-    currentFilter==='realizados' ? `${visibles} retos realizados` : `${visibles} retos disponibles`;
+
+  document.getElementById('countline').textContent=
+    currentFilter==='realizados' ? visibles+' retos realizados' : visibles+' retos disponibles';
+
   document.getElementById('empty').style.display=visibles?'none':'block';
   updateProgress();
 }
+
 function updateProgress(){
-  const total=100;
+  const total=retos.length||100;
   const done=demoRealizados.size;
   const pct=Math.min(100,Math.round((done/total)*100));
-  document.getElementById('progressText').textContent=`${done} de ${total}`;
-  document.getElementById('progressFill').style.width=`${pct}%`;
+
+  document.getElementById('progressText').textContent=done+' de '+total;
+  document.getElementById('progressFill').style.width=pct+'%';
+
   let note='¡Que comience la misión! 💜';
   if(done>=1 && done<25) note='¡Ya empezaste! Cada recuerdo cuenta 🌸';
   else if(done>=25 && done<50) note='¡Van tomando forma nuestros recuerdos! ✨';
   else if(done>=50 && done<75) note='¡Ya completaste más de la mitad! 💜';
-  else if(done>=75 && done<100) note='¡Queda poquito! 🎉';
-  else if(done>=100) note='¡100 retos completados! 🥂';
+  else if(done>=75 && done<total) note='¡Queda poquito! 🎉';
+  else if(total>0 && done>=total) note='¡100 retos completados! 🥂';
+
   document.getElementById('progressNote').textContent=note;
 }
+
 document.addEventListener('input',e=>{
   if(e.target.id==='search') renderRetos();
 });
+
 function openCapture(id){
   currentReto=id;
-  const card=document.querySelector(`.reto-card[data-id="${id}"]`);
-  document.getElementById('sheetTitle').textContent=`Reto ${id} · ${card.querySelector('h3').textContent}`;
+  const card=document.querySelector('.reto-card[data-id="'+id+'"]');
+  if(!card) return;
+
+  document.getElementById('sheetTitle').textContent=
+    'Reto '+id+' · '+card.querySelector('h3').textContent;
+
   document.getElementById('captureSheet').classList.add('open');
 }
-function hideSheet(){document.getElementById('captureSheet').classList.remove('open')}
-function closeCapture(e){if(e.target.id==='captureSheet') hideSheet()}
-function demoChoice(tipo){
-  demoRealizados.add(currentReto);
-  hideSheet();
-  renderRetos();
-  alert('Vista de demostración: aquí continuaremos con la captura/subida de ' + tipo + '.');
+
+function hideSheet(){
+  document.getElementById('captureSheet').classList.remove('open');
+}
+function closeCapture(e){
+  if(e.target.id==='captureSheet') hideSheet();
 }
 
+// Temporal: las opciones aún no suben archivos.
+// IMPORTANTE: ya NO marcan el reto como realizado.
+function demoChoice(tipo){
+  hideSheet();
+  alert('Siguiente etapa: conectaremos la captura/subida de '+tipo+
+        ' con Drive. El reto todavía NO se marca como realizado.');
+}
 
-let sorteando=false;
 function retoAleatorio(){
   if(sorteando) return;
 
-  // Ignore search/filter for the draw: use all challenges not yet completed by this guest.
-  let pool=[...document.querySelectorAll('.reto-card')].filter(card=>!demoRealizados.has(card.dataset.id));
+  let pool=[...document.querySelectorAll('.reto-card')]
+    .filter(card=>!demoRealizados.has(card.dataset.id));
+
   if(!pool.length) pool=[...document.querySelectorAll('.reto-card')];
   if(!pool.length) return;
 
@@ -797,12 +479,13 @@ function retoAleatorio(){
   const original=btn.innerHTML;
   btn.disabled=true;
 
-  // Slot-style changing numbers, progressively slowing down.
   const delays=[70,70,80,90,105,120,140,165,195,230,280,340];
   let i=0;
+
   function spin(){
     const sample=pool[Math.floor(Math.random()*pool.length)];
     btn.innerHTML='🎲 &nbsp; Reto '+sample.dataset.id;
+
     if(i<delays.length){
       setTimeout(spin,delays[i++]);
       return;
@@ -811,15 +494,19 @@ function retoAleatorio(){
     const elegido=pool[Math.floor(Math.random()*pool.length)];
     btn.innerHTML='✨ &nbsp; Reto '+elegido.dataset.id;
 
-    // Return to "Todos", clear search, and reveal the selected card.
     currentFilter='todos';
-    document.querySelectorAll('.chip').forEach(x=>x.classList.toggle('on',x.dataset.filter==='todos'));
+    document.querySelectorAll('.chip').forEach(
+      x=>x.classList.toggle('on',x.dataset.filter==='todos')
+    );
+
     const search=document.getElementById('search');
     if(search) search.value='';
+
     renderRetos();
 
     elegido.classList.remove('randomFlash');
     elegido.scrollIntoView({behavior:'smooth',block:'center'});
+
     setTimeout(()=>{
       elegido.classList.add('randomFlash');
       sorteando=false;
@@ -827,8 +514,10 @@ function retoAleatorio(){
       setTimeout(()=>{btn.innerHTML=original;},1400);
     },500);
   }
+
   spin();
 }
-
 </script>
 </body></html>
+
+
