@@ -297,6 +297,29 @@ body:has(#retos:target) #cover{display:none}
 }
 .uploadStatus.show{display:block}
 
+
+/* ===== NAVEGACIÓN INFERIOR GRANDE / ACCESIBLE ===== */
+.bottom{
+  min-height:82px !important;
+  padding:8px 10px calc(8px + env(safe-area-inset-bottom)) !important;
+  gap:8px !important;
+}
+.bottom button{
+  min-height:62px !important;
+  padding:8px 12px !important;
+  border-radius:16px !important;
+  font-size:16px !important;
+  line-height:1.15 !important;
+  font-weight:700 !important;
+  cursor:pointer;
+}
+.bottom button .navIcon{
+  display:block;
+  font-size:25px;
+  line-height:1;
+  margin-bottom:4px;
+}
+
 </style>
 </head>
 <body>
@@ -310,7 +333,7 @@ body:has(#retos:target) #cover{display:none}
  <p class="desc">Captura esos pequeños momentos<br>que quizás nosotros no alcancemos<br>a ver.</p>
  <div class="actions">
    <a class="btn entry-link" href="#retos">Ver retos &nbsp;→</a>
-   <a class="btn secondary entry-link" href="#retos">☁︎ &nbsp; Subir recuerdo &nbsp;→</a>
+   <a class="btn secondary entry-link" href="javascript:void(0)" onclick="openFreeMemory()">☁︎ &nbsp; Subir recuerdo &nbsp;→</a>
  </div>
 </section>
 
@@ -842,7 +865,26 @@ body:has(#retos:target) #cover{display:none}
     </article></div>
    <div id="empty" class="empty">No encontramos retos con esa búsqueda 🌸</div>
  </div>
- <nav class="bottom"><button class="on">▣<br>Retos</button><button>▧<br>Mis recuerdos</button></nav>
+ 
+<div id="myMemoriesPanel" style="display:none;padding:0 18px 118px;">
+  <div class="detailCard">
+    <div class="detailEyebrow">Tu galería</div>
+    <h2 class="detailTitle">Mis recuerdos</h2>
+    <p style="margin:10px 0 0;color:rgba(23,40,74,.72);line-height:1.35;">
+      Aquí aparecerán todas las fotos y videos que hayas compartido desde este dispositivo.
+    </p>
+  </div>
+  <div class="emptyGallery" style="margin-top:16px;">
+    <div class="emptyIcon">🌸</div>
+    <strong>Aún no tienes recuerdos guardados</strong>
+    <p>Cuando conectemos la galería real, tus recuerdos aparecerán aquí.</p>
+  </div>
+</div>
+
+<nav class="bottom" aria-label="Navegación principal">
+  <button id="navRetos" class="on" type="button" onclick="showRetos()"><span class="navIcon">▣</span>Retos</button>
+  <button id="navRecuerdos" type="button" onclick="showMyMemories()"><span class="navIcon">▧</span>Mis recuerdos</button>
+</nav>
 </section>
 
 
@@ -901,7 +943,7 @@ body:has(#retos:target) #cover{display:none}
     <div id="uploadPreview" class="uploadPreview">
       <img id="uploadPreviewImage" alt="Vista previa del recuerdo">
       <div class="previewActions">
-        <button class="previewPrimary" type="button" onclick="openFreeMemory()">💜 SUBIR RECUERDO</button>
+        <button class="previewPrimary" type="button" onclick="uploadTestMemory()">💜 SUBIR RECUERDO</button>
         <button class="previewSecondary" type="button" onclick="clearUploadPreview()">Cambiar foto</button>
       </div>
     </div>
@@ -1284,6 +1326,44 @@ document.addEventListener('DOMContentLoaded',()=>{
     });
   }
 });
+
+
+function setBottomNav(active){
+  const a=document.getElementById('navRetos');
+  const b=document.getElementById('navRecuerdos');
+  if(a) a.classList.toggle('on',active==='retos');
+  if(b) b.classList.toggle('on',active==='recuerdos');
+}
+
+function showRetos(){
+  const panel=document.getElementById('myMemoriesPanel');
+  if(panel) panel.style.display='none';
+
+  const controls=document.querySelector('#retos .controls');
+  const list=document.querySelector('#retos .list');
+  const empty=document.getElementById('empty');
+  if(controls) controls.style.display='';
+  if(list) list.style.display='';
+  if(empty && !list?.children.length) empty.style.display='';
+
+  setBottomNav('retos');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function showMyMemories(){
+  const panel=document.getElementById('myMemoriesPanel');
+
+  const controls=document.querySelector('#retos .controls');
+  const list=document.querySelector('#retos .list');
+  const empty=document.getElementById('empty');
+  if(controls) controls.style.display='none';
+  if(list) list.style.display='none';
+  if(empty) empty.style.display='none';
+  if(panel) panel.style.display='block';
+
+  setBottomNav('recuerdos');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
 
 </script>
 </body></html>
