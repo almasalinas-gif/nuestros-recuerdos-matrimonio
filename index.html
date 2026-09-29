@@ -1091,6 +1091,9 @@ h1{font-family:"Libre Baskerville",Georgia,serif;font-size:18px;line-height:1.45
 <input id="cameraInput" type="file" accept="image/*" capture="environment" hidden>
 <input id="videoInput" type="file" accept="video/*" capture="environment" hidden>
 
+<!-- PRUEBA TÉCNICA: el POST navega solamente dentro de este iframe oculto -->
+<iframe id="uploadTransportFrame" name="uploadTransportFrame" hidden></iframe>
+
 <div id="captureSheet" class="sheetback" onclick="closeCapture(event)">
   <div class="sheet">
     <h2 id="sheetTitle">Reto</h2>
@@ -1477,15 +1480,16 @@ async function submitTray(){
   }
 
   /*
-   * PRIMERA PRUEBA REAL:
-   * enviamos SOLO el primer archivo y exigimos que sea una foto.
-   * No cambiamos de página ni tocamos todavía la subida múltiple.
+   * SEGUNDA PRUEBA REAL:
+   * enviamos SOLO la primera foto mediante un formulario POST normal,
+   * pero dirigido a un iframe oculto. Así la página principal permanece
+   * en GitHub mientras comprobamos si Apps Script recibe el archivo.
    */
   const item=trayFiles[0];
   const file=item.file;
 
   if(!file.type.startsWith('image/')){
-    alert('Para esta primera prueba selecciona una foto. Los videos los conectaremos después de comprobar la subida.');
+    alert('Para esta prueba selecciona una foto. Los videos los conectaremos después.');
     return;
   }
 
@@ -1497,69 +1501,57 @@ async function submitTray(){
   try{
     const base64=await fileToBase64(file);
 
-    const body=new URLSearchParams();
-    body.set('accion','recuerdoReligioso');
-    body.set('idSesion',getSessionId());
-    body.set('idReto',trayContext==='reto' && currentReto ? currentReto : '');
-    body.set('tipo','foto');
-    body.set('nombreArchivo',file.name || ('foto-'+Date.now()+'.jpg'));
-    body.set('mimeType',file.type || 'image/jpeg');
-    body.set('archivoBase64',base64);
+    const form=document.createElement('form');
+    form.method='POST';
+    form.action=RECUERDOS_API;
+    form.target='uploadTransportFrame';
+    form.style.display='none';
 
-    setTrayTestStatus('Subiendo foto de prueba…');
+    const campos={
+      accion:'recuerdoReligioso',
+      idSesion:getSessionId(),
+      idReto:trayContext==='reto' && currentReto ? currentReto : '',
+      tipo:'foto',
+      nombreArchivo:file.name || ('foto-'+Date.now()+'.jpg'),
+      mimeType:file.type || 'image/jpeg',
+      archivoBase64:base64
+    };
 
-    const response=await fetch(RECUERDOS_API,{
-      method:'POST',
-      headers:{
-        'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8'
-      },
-      body:body.toString(),
-      redirect:'follow'
+    Object.entries(campos).forEach(([name,value])=>{
+      const input=document.createElement('input');
+      input.type='hidden';
+      input.name=name;
+      input.value=value;
+      form.appendChild(input);
     });
 
-    if(!response.ok){
-      throw new Error('El servidor respondió HTTP '+response.status+'.');
-    }
+    document.body.appendChild(form);
+    setTrayTestStatus('Enviando foto de prueba…');
 
-    const text=await response.text();
-    let result;
+    form.submit();
 
-    try{
-      result=JSON.parse(text);
-    }catch(error){
-      throw new Error('Apps Script respondió, pero no pude leer su respuesta como JSON.');
-    }
-
-    if(!result.ok){
-      throw new Error(result.error || 'Apps Script no pudo guardar la foto.');
-    }
-
-    setTrayTestStatus('✓ Foto guardada correctamente 💜');
-
-    /* Quitamos de la bandeja únicamente el archivo confirmado. */
-    trayFiles=trayFiles.filter(x=>x.id!==item.id);
-
+    /*
+     * Por ser un iframe hacia otro dominio, GitHub no puede leer de forma
+     * fiable el JSON devuelto por Apps Script. En esta prueba NO marcamos
+     * el recuerdo como guardado: comprobamos Drive y Sheets manualmente.
+     */
     setTimeout(()=>{
-      renderTray();
+      form.remove();
+      setTrayTestStatus('Foto enviada. Revisa Drive y Sheets 💜');
       alert(
-        '¡PRUEBA EXITOSA! 💜\n\n'+
-        'La foto fue enviada sin abandonar GitHub.\n\n'+
+        'La solicitud fue enviada sin abandonar GitHub. 💜\n\n'+
         'Ahora revisa:\n'+
         '1. La carpeta MATRIMONIO RELIGIOSO en Drive.\n'+
         '2. La hoja RECUERDOS_RELIGIOSO.\n\n'+
-        'El ID_RETO debe estar vacío porque esta prueba es un recuerdo libre.'
+        'No cierres ni cambies nada todavía. Dime solamente si la foto y la fila aparecieron.'
       );
-    },500);
+      if(button) button.disabled=false;
+    },2500);
 
   }catch(error){
-    console.error('Error prueba subida:',error);
-    setTrayTestStatus('⚠️ No se pudo confirmar la subida.');
-    alert(
-      'La prueba no pudo completarse.\n\n'+
-      error.message+
-      '\n\nNo cambies nada todavía: este resultado nos dirá cuál es el siguiente ajuste.'
-    );
-  }finally{
+    console.error('Error prueba iframe:',error);
+    setTrayTestStatus('⚠️ No se pudo preparar el envío.');
+    alert('No pude preparar la foto para enviarla.\n\n'+error.message);
     if(button) button.disabled=false;
   }
 }
