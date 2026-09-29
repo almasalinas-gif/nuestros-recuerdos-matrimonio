@@ -1111,6 +1111,56 @@ const demoRealizados=new Set();
 let trayFiles=[];
 let trayContext='free';
 
+/* ===== PRUEBA TÉCNICA · SUBIDA REAL ===== */
+const RECUERDOS_API =
+  'https://script.google.com/macros/s/AKfycbzGZxguZB-diYDtcI1q0Vsx0aTgd42Lvi31JQnr0o_42ckNY8qagSaOMrIsxmTQ4IJdug/exec';
+
+function getSessionId(){
+  let id=localStorage.getItem('fa_recuerdos_sesion_religioso');
+  if(id) return id;
+
+  if(window.crypto && typeof crypto.randomUUID==='function'){
+    id=crypto.randomUUID();
+  }else{
+    id='SES-'+Date.now()+'-'+Math.random().toString(36).slice(2,10);
+  }
+
+  localStorage.setItem('fa_recuerdos_sesion_religioso',id);
+  return id;
+}
+
+function fileToBase64(file){
+  return new Promise((resolve,reject)=>{
+    const reader=new FileReader();
+    reader.onload=()=>{
+      const result=String(reader.result||'');
+      const comma=result.indexOf(',');
+      if(comma<0){
+        reject(new Error('No pude preparar la foto.'));
+        return;
+      }
+      resolve(result.slice(comma+1));
+    };
+    reader.onerror=()=>reject(new Error('No pude leer la foto.'));
+    reader.readAsDataURL(file);
+  });
+}
+
+function setTrayTestStatus(message){
+  const tray=el('tray-'+trayContext);
+  if(!tray) return;
+
+  let status=tray.querySelector('.uploadStatus');
+  if(!status){
+    status=document.createElement('div');
+    status.className='uploadStatus show';
+    tray.appendChild(status);
+  }
+  status.classList.add('show');
+  status.textContent=message;
+}
+
+
 function el(id){ return document.getElementById(id); }
 
 function hideAllMainViews(){
@@ -1420,12 +1470,98 @@ function removeTrayItem(id){
   renderTray();
 }
 
-function submitTray(){
-  alert(
-    `Bandeja lista 💜\n\nTienes ${trayFiles.length} ${
-      trayFiles.length===1?'recuerdo preparado.':'recuerdos preparados.'
-    }\n\nTodavía no los enviaremos a Drive hasta terminar esta prueba de interfaz.`
-  );
+async function submitTray(){
+  if(!trayFiles.length){
+    alert('Primero selecciona una foto 💜');
+    return;
+  }
+
+  /*
+   * PRIMERA PRUEBA REAL:
+   * enviamos SOLO el primer archivo y exigimos que sea una foto.
+   * No cambiamos de página ni tocamos todavía la subida múltiple.
+   */
+  const item=trayFiles[0];
+  const file=item.file;
+
+  if(!file.type.startsWith('image/')){
+    alert('Para esta primera prueba selecciona una foto. Los videos los conectaremos después de comprobar la subida.');
+    return;
+  }
+
+  const button=document.querySelector(`#tray-${trayContext} .trayButton:not(.trayMore)`);
+  if(button) button.disabled=true;
+
+  setTrayTestStatus('Preparando foto…');
+
+  try{
+    const base64=await fileToBase64(file);
+
+    const body=new URLSearchParams();
+    body.set('accion','recuerdoReligioso');
+    body.set('idSesion',getSessionId());
+    body.set('idReto',trayContext==='reto' && currentReto ? currentReto : '');
+    body.set('tipo','foto');
+    body.set('nombreArchivo',file.name || ('foto-'+Date.now()+'.jpg'));
+    body.set('mimeType',file.type || 'image/jpeg');
+    body.set('archivoBase64',base64);
+
+    setTrayTestStatus('Subiendo foto de prueba…');
+
+    const response=await fetch(RECUERDOS_API,{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8'
+      },
+      body:body.toString(),
+      redirect:'follow'
+    });
+
+    if(!response.ok){
+      throw new Error('El servidor respondió HTTP '+response.status+'.');
+    }
+
+    const text=await response.text();
+    let result;
+
+    try{
+      result=JSON.parse(text);
+    }catch(error){
+      throw new Error('Apps Script respondió, pero no pude leer su respuesta como JSON.');
+    }
+
+    if(!result.ok){
+      throw new Error(result.error || 'Apps Script no pudo guardar la foto.');
+    }
+
+    setTrayTestStatus('✓ Foto guardada correctamente 💜');
+
+    /* Quitamos de la bandeja únicamente el archivo confirmado. */
+    trayFiles=trayFiles.filter(x=>x.id!==item.id);
+
+    setTimeout(()=>{
+      renderTray();
+      alert(
+        '¡PRUEBA EXITOSA! 💜\n\n'+
+        'La foto fue enviada sin abandonar GitHub.\n\n'+
+        'Ahora revisa:\n'+
+        '1. La carpeta MATRIMONIO RELIGIOSO en Drive.\n'+
+        '2. La hoja RECUERDOS_RELIGIOSO.\n\n'+
+        'El ID_RETO debe estar vacío porque esta prueba es un recuerdo libre.'
+      );
+    },500);
+
+  }catch(error){
+    console.error('Error prueba subida:',error);
+    setTrayTestStatus('⚠️ No se pudo confirmar la subida.');
+    alert(
+      'La prueba no pudo completarse.\n\n'+
+      error.message+
+      '\n\nNo cambies nada todavía: este resultado nos dirá cuál es el siguiente ajuste.'
+    );
+  }finally{
+    if(button) button.disabled=false;
+  }
 }
 
 document.addEventListener('input',e=>{
